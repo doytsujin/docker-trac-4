@@ -1,18 +1,24 @@
-FROM marina/python-web:0.1.0
+FROM marina/python-web:0.5.0
 MAINTAINER Steffen Prince <sprin@fastmail.net>
 
 # Pip install Trac
 RUN pip install --allow-external Trac --allow-unverified Trac \
-    Trac==0.11.7 \
-    psycopg2==2.5.4 \
+    Trac==1.0.5 \
+    psycopg2==2.6 \
     genshi==0.6.0
 
-ADD src/ /opt/trac/
+COPY src/ /opt/trac/
+COPY uwsgi.ini /opt/trac/uwsgi.ini
+COPY config.py.patch /tmp/config.py.patch
 
-RUN chmod +x /opt/trac/start_uwsgi.sh
+# Patch trac to read from environment
+RUN yum install -y patch
+RUN cd /usr/local/lib/python2.7/site-packages/trac && patch -p0 -i /tmp/config.py.patch
 
 # Expose
 EXPOSE  8080
 
+WORKDIR /opt/trac
+
 # Run
-CMD ["/opt/trac/start_uwsgi.sh"]
+CMD ["/usr/local/bin/uwsgi", "--ini", "uwsgi.ini"]
