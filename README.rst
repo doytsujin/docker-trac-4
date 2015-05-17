@@ -26,3 +26,16 @@ Run:
 .. code::
 
    docker run -d -p 8080:8080 trac
+
+Database Setup
+==============
+
+You need a database before you can run trac commands or use the web interface.
+
+To create a `trac` user in Postgres:
+
+.. code::
+
+   create role trac with login;
+   grant connect on database trac to trac;
+   grant usage on schema public to trac;
