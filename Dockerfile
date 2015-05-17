@@ -9,8 +9,7 @@ ENV DATABASE_URL=sqlite:db/trac.db
 # Pip install Trac
 RUN pip install --allow-external Trac --allow-unverified Trac \
     Trac==1.0.5 \
-    psycopg2==2.6 \
-    genshi==0.6.0
+    psycopg2==2.6
 
 # Patch trac to read from environment
 COPY config.py.patch /tmp/config.py.patch
@@ -20,11 +19,17 @@ RUN yum install -y patch \
 
 COPY src/ /opt/trac/
 COPY uwsgi.ini /opt/trac/uwsgi.ini
+# Touch an empty htpasswd file
+RUN mkdir /var/trac && touch /var/trac/trac.htpasswd
 
 WORKDIR /opt/trac
 
 # Copy static files
-RUN /usr/local/bin/trac-admin /opt/trac/trac_project deploy /chrome
+RUN env -i DATABASE_URL=sqlite:db/trac.db \
+    /usr/local/bin/trac-admin /opt/trac/trac_project deploy /chrome
+
+# Copy ini, again, to side-step trac-admin mangling.
+COPY src/trac_project/conf/trac.ini /opt/trac/trac_project/conf/trac.ini
 
 # Run
 CMD ["/usr/local/bin/uwsgi", "--ini", "uwsgi.ini"]
