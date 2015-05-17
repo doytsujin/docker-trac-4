@@ -39,3 +39,17 @@ To create a `trac` user in Postgres:
    create role trac with login;
    grant connect on database trac to trac;
    grant usage on schema public to trac;
+
+Plugins
+=======
+
+Only plugins we consider essential are included:
+
+ - `AccountManagerPlugin`_
+
+Plugin sources are vendored in, and can be found in `plugins/`. Plugins
+are vendored because installing from sources on the network in the
+Dockerfile can be slow/fragile/complex. Plugins are built in to binary
+distribution eggs, which are placed in `src/trac_project/plugins/`.
+
+.. _AccountManagerPlugin: https://trac-hacks.org/wiki/AccountManagerPlugin
