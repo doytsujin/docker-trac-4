@@ -25,7 +25,7 @@ RUN mkdir /var/trac && touch /var/trac/trac.htpasswd
 WORKDIR /opt/trac
 
 # Copy static files
-RUN env -i DATABASE_URL=sqlite:db/trac.db \
+RUN env -i DATABASE_URL=$DATABASE_URL \
     /usr/local/bin/trac-admin /opt/trac/trac_project deploy /chrome
 
 # Copy ini, again, to side-step trac-admin mangling.
