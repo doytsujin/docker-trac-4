@@ -2,34 +2,27 @@
 docker-trac
 ===========
 
-Dockerized `trac`_.
+Dockerized `Trac`_. A small patch to enable injecting environment
+variables into trac.ini is used.
 
-.. _trac: http://trac.edgewall.org/
+.. _Trac: http://trac.edgewall.org/
 
 Instructions
 ============
 
-Create Postgres container and database (optionally restoring from dump):
+It is recommended to use this as a base image. Your image should contain
+a custom trac.ini and another other plugins or static assets needed.
+
+For connection parameters, it is recommended to use environment variables.
+If you have your connection string in the environment variable
+$DATABASE_URL, trac.ini should have:
 
 .. code::
 
-   docker run -d --name trac_project_db -p 192.168.50.5:5432:5432 \
-      -e SERVICE_5432_NAME=trac_project_db postgres
-   createdb -U postgres -h trac_project_db.service.consul -E UTF-8 trac
-   pg_restore -U postgres -h trac_project_db.service.consul -d trac \
-      trac_project_db.dump
-
-Create a custom trac.ini, ensuring the correct database name:
-
-.. code::
-
-   vi /var/docker_volumes/trac_project/conf/trac.ini
-
-   database = postgres://postgres@trac_project_db.service.consul/trac
+   database = %(DATABASE_URL)s
 
 Run:
 
 .. code::
 
-   docker run -d --name trac_project -p 8080:8080 \
-       -v /var/docker_volumes/trac_project/conf/trac.ini:/opt/trac/trac_project/conf/trac.ini
+   docker run -d -p 8080:8080 trac
