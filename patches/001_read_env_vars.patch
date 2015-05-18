@@ -1,0 +1,26 @@
+--- config.py.old	2015-05-18 03:27:17.473772691 +0000
++++ config.py	2015-05-18 03:28:38.998313148 +0000
+@@ -16,7 +16,9 @@
+ 
+ from ConfigParser import ConfigParser
+ from copy import deepcopy
++import os
+ import os.path
++import re
+ 
+ from genshi.builder import tag
+ from trac.admin import AdminCommandError, IAdminCommandProvider
+@@ -397,6 +399,13 @@
+             value = u''
+         elif isinstance(value, basestring):
+             value = to_unicode(value)
++
++        # Substitute environment variables
++        if isinstance(value, basestring):
++            m = re.match(r'\$([A-Z_]+[A-Z0-9_]*)', value)
++            if m:
++                value = os.environ[m.group(1)]
++
+         self._cache[key] = value
+         return value
+ 
